@@ -12,7 +12,7 @@ export default function App() {
   const [two, setTwo] = useState<string>();
 
   useEffect(() => {
-    fetch("http://localhost:3001/pokemon-list", {
+    fetch("/api/pokemon-list", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     }).then((data) => {
@@ -29,7 +29,7 @@ export default function App() {
   const [img2, setImg2] = useState<string>();
 
   useEffect(() => {
-    fetch("http://localhost:3001/single-image", {
+    fetch("/api/single-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -43,7 +43,7 @@ export default function App() {
   }, [one]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/single-image", {
+    fetch("/api/single-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -58,25 +58,23 @@ export default function App() {
     e.preventDefault();
     setLoading(true);
 
-    const body = {
-      prompt:
-        "based on the two images of pokemon, derive a new pokemon that is visually pleasing in a pixelated style reminiscent of old game sprites",
-      image1: img1,
-      image2: img2,
-      size: "1024x1024",
-      quality: "low",
-      response: "dataUrl",
-      input_fidelity: "low",
-    };
-
-    const res = await fetch("http://localhost:3001/image-combine", {
+    await fetch("/api/image-combine", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const json = await res.json();
+      body: JSON.stringify({
+        prompt:
+          "based on the two images of pokemon, derive a new pokemon that is visually pleasing in a pixelated style reminiscent of old game sprites",
+        image1: img1,
+        image2: img2,
+        size: "1024x1024",
+        quality: "low",
+        input_fidelity: "low",
+        response: "dataUrl",
+      }),
+    })
+      .then((r) => r.json())
+      .then(({ imageUrl }) => setFeatures(imageUrl));
 
-    setFeatures(json.imageUrl);
     setLoading(false);
   };
 
