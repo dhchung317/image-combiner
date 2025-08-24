@@ -6,10 +6,8 @@ import {
   fetchImage,
   prepareImageInputs,
 } from "./functions/imageCombiner.js";
-import { fetchPokeList } from "./functions/pokemon.js";
 
 dotenv.config();
-console.log("🔍 KEY:", process.env.OPENAI_API_KEY);
 
 const app = express();
 
@@ -18,8 +16,9 @@ app.use(express.json());
 
 app.post("/pokemon-list", async (_req, res) => {
   try {
-    const pokelist = await fetchPokeList();
-    return res.json(pokelist);
+    const pokelist = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
+
+    return res.json(await pokelist.json());
   } catch (e) {
     console.error("😀", e);
   }
@@ -30,7 +29,6 @@ app.post("/single-image", async (req, res) => {
     const { image } = req.body || {};
 
     const pokemon = await fetchImage(image);
-    console.log("😃", pokemon);
     return res.json({ imgUrl: pokemon.sprites.front_default });
   } catch (e) {
     console.error("😀", e);
@@ -41,12 +39,12 @@ app.post("/image-combine", async (req, res) => {
   try {
     const {
       prompt,
-      image1, // URL | data URL | raw base64 | Buffer (if using multipart parser)
-      image2, // URL | data URL | raw base64 | Buffer
+      image1,
+      image2,
       size = "256x256",
       quality = "low",
       input_fidelity = "high",
-      response = "dataUrl", // "dataUrl" | "json" | "binary"
+      response = "dataUrl",
     } = req.body || {};
 
     if (!process.env.OPENAI_API_KEY) {

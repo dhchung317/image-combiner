@@ -1,10 +1,11 @@
 import fetch from "node-fetch";
 import FormData from "form-data";
+import sharp from "sharp";
 
 type ImageInput = Buffer | string;
 
 export type CombineImageOptions = {
-  size?: "256x256" | "512x512" | "1024x1024" | "1792x1024" | "1024x1792";
+  size?: "1024x1024" | "1792x1024" | "1024x1792";
   quality?: "low" | "medium" | "high";
   input_fidelity?: "low" | "medium" | "high";
 };
@@ -14,10 +15,10 @@ export async function combineImages(
   img2: ImageInput,
   prompt: string,
   options: CombineImageOptions = {}
-) {
+): Promise<{ data: any } | null> {
   const {
     size = "1024x1024",
-    quality = "high",
+    quality = "low",
     input_fidelity = "high",
   } = options;
 
@@ -27,30 +28,8 @@ export async function combineImages(
   form.append("size", size);
   form.append("quality", quality);
   form.append("input_fidelity", input_fidelity);
-
-  // helper to normalize inputs
-  const addImage = (img: ImageInput, fallbackName: string) => {
-    if (Buffer.isBuffer(img)) {
-      form.append("image[]", img, { filename: fallbackName });
-    } else if (typeof img === "string") {
-      // accept base64 data URL or raw base64
-      const match = img.match(/^data:(.+?);base64,(.*)$/);
-      let b64 = img;
-      let ext = "png";
-      if (match) {
-        b64 = match[2];
-        const mime = match[1];
-        ext = mime.includes("jpeg") ? "jpg" : mime.split("/")[1];
-      }
-      const buf = Buffer.from(b64, "base64");
-      form.append("image[]", buf, { filename: `${fallbackName}.${ext}` });
-    } else {
-      throw new Error("Unsupported image type");
-    }
-  };
-
-  addImage(img1, "image1");
-  addImage(img2, "image2");
+  form.append("image[]", img1, { filename: "image1" });
+  form.append("image[]", img2, { filename: "image2" });
 
   const res = await fetch("https://api.openai.com/v1/images/edits", {
     method: "POST",
@@ -61,10 +40,16 @@ export async function combineImages(
   });
 
   const json = await res.json();
+
   if (!res.ok) {
     throw new Error(`OpenAI error: ${JSON.stringify(json)}`);
   }
-  return json;
+
+  if (typeof json === "object" && json !== null && "data" in json) {
+    return json;
+  }
+
+  return null;
 }
 
 export async function fetchImage(src: string): Promise<any> {
@@ -73,44 +58,29 @@ export async function fetchImage(src: string): Promise<any> {
   return await res.json();
 }
 
-type ImageSource = string | Buffer;
-// string can be a URL or base64 data URL
-// Buffer = binary image
-
 /**
  * Normalize arbitrary inputs into Buffers for combineImages()
  */
 export async function prepareImageInputs(
-  src1: ImageSource,
-  src2: ImageSource
+  src1: string,
+  src2: string
 ): Promise<[Buffer, Buffer]> {
-  async function toBuffer(src: ImageSource): Promise<Buffer> {
-    if (Buffer.isBuffer(src)) {
-      return src; // already binary
-    }
+  const buffer1 = await getImageBuffer(src1);
+  const buffer2 = await getImageBuffer(src2);
 
-    if (typeof src === "string") {
-      // Case 1: data URL (e.g. "data:image/png;base64,...")
-      const match = src.match(/^data:(.+?);base64,(.*)$/);
-      if (match) {
-        return Buffer.from(match[2], "base64");
-      }
+  const thumb1 = sharp(buffer1)
+    .resize({ width: 40, height: 40, fit: "inside" })
+    .toBuffer();
+  const thumb2 = sharp(buffer2)
+    .resize({ width: 40, height: 40, fit: "inside" })
+    .toBuffer();
 
-      // Case 2: raw base64 string
-      if (/^[A-Za-z0-9+/]+={0,2}$/.test(src.trim())) {
-        return Buffer.from(src, "base64");
-      }
-
-      // Case 3: assume it's a URL
-      const res = await fetch(src);
-      if (!res.ok) throw new Error(`Failed to fetch image from ${src}`);
-      const arrayBuf = await res.arrayBuffer();
-      return Buffer.from(arrayBuf);
-    }
-
-    throw new Error("Unsupported image source type");
-  }
-
-  const [buf1, buf2] = await Promise.all([toBuffer(src1), toBuffer(src2)]);
+  const [buf1, buf2] = await Promise.all([thumb1, thumb2]);
   return [buf1, buf2];
+}
+
+async function getImageBuffer(url: string) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+  return Buffer.from(await res.arrayBuffer());
 }
