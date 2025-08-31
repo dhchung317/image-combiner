@@ -55,6 +55,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const {
       prompt,
+      tag1,
+      tag2,
       image1,
       image2,
       size = "256x256", // small & cheap for testing
@@ -70,10 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .status(400)
         .json({ error: "Provide 'prompt', 'image1', and 'image2'." });
 
-    const [buf1, buf2] = await Promise.all([
-      toBuffer(image1),
-      toBuffer(image2),
-    ]);
+    const [buf1, buf2] = await prepareImageInputs(image1, image2);
 
     // Use Web FormData + Blob (available on Vercel’s runtime)
     const fd = new FormData();
@@ -82,9 +81,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     fd.append("size", String(size)); // allowed: 256x256, 512x512, 1024x1024, 1792x1024, 1024x1792
     fd.append("quality", String(quality)); // low/medium/high
     fd.append("input_fidelity", String(input_fidelity)); // low/medium/high
+    fd.append("output_format", "png");
+    fd.append("background", "transparent");
 
-    fd.append("image[]", new Blob([buf1], { type: "image/png" }), "image1.png");
-    fd.append("image[]", new Blob([buf2], { type: "image/png" }), "image2.png");
+    fd.append(
+      "image[]",
+      new Blob([buf1], { type: "image/png" }),
+      `${tag1}.png`
+    );
+    fd.append(
+      "image[]",
+      new Blob([buf2], { type: "image/png" }),
+      `${tag2}.png`
+    );
     // Optional mask:
     // fd.append("mask", new Blob([maskBuf], { type: "image/png" }), "mask.png");
 
