@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface SubmitProps {
   onSubmit?: (e: React.FormEvent) => Promise<void>;
@@ -6,7 +6,7 @@ interface SubmitProps {
   buttonText?: string;
 }
 
-const Submit: React.FC<SubmitProps> = ({
+export const Submit: React.FC<SubmitProps> = ({
   onSubmit,
   isLoading = false,
   buttonText = "Submit",
@@ -29,5 +29,3 @@ const Submit: React.FC<SubmitProps> = ({
     </form>
   );
 };
-
-export default Submit;

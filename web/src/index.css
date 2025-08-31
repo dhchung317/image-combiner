@@ -1,18 +1,142 @@
 @import "tailwindcss";
 
-/* HTML: <div class="loader"></div> */
+.pokedex-bg {
+  background-image: linear-gradient(160deg, #f71212 0%, #ff7070 100%);
+}
+
 .loader {
   width: 60px;
   aspect-ratio: 1;
-  --g: conic-gradient(from -90deg at 10px 10px,#fff 90deg,#0000 0);
-  background: 
-    var(--g),
-    var(--g) 10px 10px,
-    var(--g) 20px 20px;
+  --g: conic-gradient(from -90deg at 10px 10px, #fff 90deg, #0000 0);
+  background: var(--g), var(--g) 10px 10px, var(--g) 20px 20px;
   background-size: 50% 50%;
   animation: l15 1s infinite;
 }
 
+.glass-bg {
+  background-color: #0093e9;
+  background-image: linear-gradient(160deg, #0093e9 0%, #80d0c7 100%);
+  border-radius: 12px;
+}
+
+.glass {
+  opacity: 0.1;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.1)
+  );
+  backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  border: 1px solid rgba(209, 213, 219, 0.3);
+}
+
 @keyframes l15 {
-    90%,100%  {background-position: -30px 30px,-20px 40px,-10px 50px} 
+  90%,
+  100% {
+    background-position: -30px 30px, -20px 40px, -10px 50px;
+  }
+}
+
+.lcd-grid::after {
+  display: block;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: 4px 4px;
+  mix-blend-mode: multiply;
+  background-image: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.15) 33.33333%,
+      rgba(255, 255, 255, 0.25) 33.33333%,
+      rgba(255, 255, 255, 0.4) 66.66666%,
+      rgba(255, 255, 255, 0.6) 66.66666%
+    ),
+    linear-gradient(
+      to right,
+      rgba(255, 0, 0, 0.25) 33.33333%,
+      rgba(0, 255, 0, 0.25) 33.33333%,
+      rgba(0, 255, 0, 0.25) 66.66666%,
+      rgba(0, 0, 255, 0.25) 66.66666%
+    );
+  border-radius: 12px;
+}
+
+.lcd {
+  background: #2e2e2e;
+  color: #fff;
+  text-shadow: 2px 0 rgba(255, 0, 0, 0.9), -2px 0 rgba(0, 0, 255, 0.9);
+  border-radius: 12px;
+}
+
+.gradient-border {
+  border: 14px inset #cd3434;
+}
+
+.progress {
+  background-color: #202020;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #5d5d5d;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+progress::-webkit-progress-value {
+  background-color: #6eef6e;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.blink {
+  animation: blink 2s infinite;
+}
+
+.clip-path {
+  /* border-radius: 12px; */
+  clip-path: polygon(100% 0, 100% 75%, 64% 75%, 30% 100%, 0 100%, 0 0);
+}
+
+.sphere {
+  height: 200px;
+  width: 200px;
+  border-radius: 50%;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 500%;
+  position: relative;
+
+  box-shadow: inset -5px -5px 50px #7d2626, 5px 5px 10px rgb(124, 34, 34),
+    inset 0px 0px 5px rgb(105, 26, 26);
+
+  margin: 5%;
+}
+
+.sphere::after {
+  background-color: rgba(255, 255, 255, 0.3);
+  content: "";
+  height: 45%;
+  width: 12%;
+  position: absolute;
+  top: 4%;
+  left: 15%;
+  border-radius: 50%;
+  transform: rotate(40deg);
+}
+
+.hide {
+  opacity: 0;
 }
