@@ -24,6 +24,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-live": "^4.1.8",
+    "react-router-dom": "^7.8.2",
     "sharp": "^0.34.3",
     "tailwindcss": "^4.1.12"
   },
@@ -36,6 +37,7 @@
     "@vitejs/plugin-react": "^4.5.2",
     "autoprefixer": "^10.4.21",
     "jest": "^29.7.0",
+    "pokeapi-types": "0.0.2",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"
   }
