@@ -40,5 +40,10 @@
     "pokeapi-types": "0.0.2",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"
+  },
+  "overrides": {
+    "vite": {
+      "rollup": "npm:@rollup/wasm-node"
+    }
   }
 }
