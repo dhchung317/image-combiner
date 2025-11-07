@@ -92,8 +92,8 @@ export default function ImageCombiner() {
     <div className="p-6 space-y-6 w-full mx-auto bg-red-300">
       <h1 className="text-2xl font-bold">Pokemon Blender</h1>
 
-      <div className="flex w-full gap-4 padding-2">
-        <div className="flex flex-col w-full">
+      <div className="flex w-full gap-4 padding-2 justify-between">
+        <div className="flex flex-col content-center">
           <Options
             rawOptions={list}
             isLoading={loading}
@@ -101,12 +101,12 @@ export default function ImageCombiner() {
               setOne(x.target.value);
             }}
           />
-          <img className="" src={img1}></img>
+          <img className="w-100% md:max-w-52 lg:max-w-84" src={img1}></img>
         </div>
 
-        <div className="relative w-full">
+        <div className="min-w-48 relative flex flex-1 justify-center">
           {features ? (
-            <img className="h-full w-full" src={features} alt="combined" />
+            <img className="w-100% min-w-48 md:max-w-64 lg:max-w-96" src={features} alt="combined" />
           ) : null}
 
           {loading ? (
@@ -116,7 +116,7 @@ export default function ImageCombiner() {
           ) : null}
         </div>
 
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col content-center">
           <Options
             rawOptions={list}
             isLoading={loading}
@@ -124,7 +124,7 @@ export default function ImageCombiner() {
               setTwo(x.target.value);
             }}
           />
-          <img className="" src={img2}></img>
+          <img className="w-100% md:max-w-52 lg:max-w-84" src={img2}></img>
         </div>
       </div>
 
